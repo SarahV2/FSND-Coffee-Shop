@@ -51,7 +51,8 @@ def get_drinks():
 
 
 @app.route("/drinks-detail", methods=["GET"])
-def get_drinks_details():
+@requires_auth("get:drinks-detail")
+def get_drinks_details(token):
     drinks = Drink.query.all()
     if len(drinks) == 0:
         abort(404)
@@ -72,7 +73,8 @@ def get_drinks_details():
 
 
 @app.route("/drinks", methods=["POST"])
-def add_drink():
+@requires_auth("post:drinks")
+def add_drink(payload):
     error = False
     try:
         drinks = Drink.query.all()
@@ -102,7 +104,8 @@ def add_drink():
 
 
 @app.route("/drinks/<drink_id>", methods=["PATCH"])
-def update_drink(drink_id):
+@requires_auth("patch:drink")
+def update_drink(token,drink_id):
     error = False
     try:
         drink = Drink.query.get(drink_id)
@@ -132,7 +135,8 @@ def update_drink(drink_id):
 
 
 @app.route("/drinks/<drink_id>", methods=["DELETE"])
-def delete_drink(drink_id):
+@requires_auth("delete:drink")
+def delete_drink(token,drink_id):
     error = False
     try:
         drink = Drink.query.get(drink_id)
@@ -173,7 +177,7 @@ def unprocessable(error):
 """
 
 
-@app.errorhandler(422)
+@app.errorhandler(404)
 def not_found(error):
     return (
         jsonify({"success": False, "error": 404, "message": "resource not found"}),
